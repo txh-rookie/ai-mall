@@ -9,9 +9,9 @@ spring:
       discovery:
         server-addr: localhost:8848
     alicloud:
-      access-key: LTAI5tDpjsbnHhqUqoXJAZpS
+      access-key: 
       oss:
-        endpoint: oss-cn-hangzhou.aliyuncs.com
+        endpoint: 
   profiles:
     active: dev
   application:
