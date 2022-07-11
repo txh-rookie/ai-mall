@@ -1,0 +1,42 @@
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mall_oms?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: kevintam
+  application:
+    name: mall-order-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: kevintam
+#    开启发送端的异步回调 即生成者,将消息发送到broker中
+    publisher-confirm-type: correlated
+#    开启交换机到队列的消息应答
+    publisher-returns: true
+#    主要消息抵达队列，以异步的信息进行回调
+    template:
+      mandatory: true
+    listener:
+      simple:
+#        acknowledge-mode: auto #自动回复
+        acknowledge-mode: manual #手动应答ack
+  thymeleaf:
+    cache: false
+  session:
+    store-type: redis
+  redis:
+    host: localhost
+    port: 6379
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml #设置mapper的位置
+  global-config:
+    db-config:
+      id-type: auto #id的自增
+server:
+  port: 8004

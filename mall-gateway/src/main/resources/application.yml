@@ -1,0 +1,61 @@
+server:
+  port: 88
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mall_sms?serverTimezone=UTC
+    username: root
+    password: kevintam
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+    gateway:
+      routes: #配置路由
+        - id: product_router
+          uri: lb://mall-product
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - RewritePath=/api/(?<segment>/?.*), /$\{segment}
+
+        - id: admin_router
+#          lb表示负载均衡
+          uri: lb://mall-renren-fast
+          #如果请求中有api则给你进行转发到这个服务
+          predicates:
+            - Path=/api/**
+          filters:
+            - RewritePath=/api/(?<segment>/?.*), /renren-fast/$\{segment}
+
+          #网关自带的路径重写
+        - id: member_router
+          uri: lb://mall-member
+          predicates:
+            - Path=/api/member/**
+          filters:
+            - RewritePath=/api/(?<segment>/?.*), /$\{segment}
+        - id: product_host_router #域名配置路由必须放在最后,如果放在前面的话，它会优先匹配该路由，其他路由就不会生效来。
+          uri: lb://mall-product
+          predicates:
+            - Host=serookie.com
+        - id: search_host_router
+          uri: lb://elasticsearch-service
+          predicates:
+            - Host=search.serookie.com
+#              配置auth的网关
+        - id: auth_host_router
+          uri: lb://mall-auth-service
+          predicates:
+            - Host=auth.serookie.com
+        - id: cart_host_router
+          uri: lb://mall-cart-service
+          predicates:
+            - Host=cart.serookie.com
+        - id: order_host_router
+          uri: lb://mall-order-service
+          predicates:
+            - Host=order.serookie.com
+
+  application:
+    name: mall-gateway

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.serookie.product.dao.SkuSaleAttrValueDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.serookie.product.entity.SkuSaleAttrValueEntity" id="skuSaleAttrValueMap">
+        <result property="id" column="id"/>
+        <result property="skuId" column="sku_id"/>
+        <result property="attrId" column="attr_id"/>
+        <result property="attrName" column="attr_name"/>
+        <result property="attrValue" column="attr_value"/>
+        <result property="attrSort" column="attr_sort"/>
+    </resultMap>
+    <select id="getSelectAttrSaleBySkuId" resultType="com.serookie.product.vo.SkuItemSaleAttrVo">
+        select pssav.attr_name attr_name,
+               pssav.attr_id as attr_id,
+               GROUP_CONCAT(DISTINCT pssav.attr_value) as attr_value
+        from pms_sku_info info
+                 left join pms_sku_sale_attr_value pssav
+                           on info.sku_id=pssav.sku_id
+        where info.spu_id=#{spuId}
+        group by pssav.attr_name,pssav.attr_id
+    </select>
+
+    <select id="selectSkuIdAttr" resultType="java.lang.String">
+        select CONCAT(attr_name,":",attr_value) from pms_sku_sale_attr_value
+        where sku_id=#{skuId}
+    </select>
+
+</mapper>

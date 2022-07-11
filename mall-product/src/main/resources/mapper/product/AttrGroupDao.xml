@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.serookie.product.dao.AttrGroupDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.serookie.product.entity.AttrGroupEntity" id="attrGroupMap">
+        <result property="attrGroupId" column="attr_group_id"/>
+        <result property="attrGroupName" column="attr_group_name"/>
+        <result property="sort" column="sort"/>
+        <result property="descript" column="descript"/>
+        <result property="icon" column="icon"/>
+        <result property="catelogId" column="catelog_id"/>
+    </resultMap>
+
+    <select id="ConditionQueryList" resultMap="attrGroupMap">
+        select attr_group_id,attr_group_name,sort,descript,icon,catelogId from pms_attr_group where
+       catelogId=#{catelogId} and
+         <if test="!#{attr_group_id}==null">
+             (attr_group_id=#{key} or
+         </if>
+        <if test="!#{attr_group_name}==null">
+            attr_group_name like "%" #{attrGroupName} "%" )
+        </if>
+    </select>
+    <resultMap id="spuGroupByAttrVo" type="com.serookie.product.vo.SpuItemGroupAttrVo">
+         <result property="groupName" column="attr_group_name"></result>
+         <collection property="spuGroupByAttrVos" ofType="com.serookie.product.vo.SpuGroupByAttrVo">
+             <result property="attrName" column="attr_name"></result>
+             <result property="attrValue" column="attr_value"></result>
+         </collection>
+    </resultMap>
+    <select id="getSpuGroupWithAttrs" resultMap="spuGroupByAttrVo">
+        SELECT
+            ag.attr_group_name,ag.attr_group_id,pa.attr_id,pa.attr_name,pav.attr_value
+        FROM
+            pms_attr_group ag left join pms_attr_attrgroup_relation atr on ag.attr_group_id=atr.attr_group_id
+            left join pms_attr pa on  pa.attr_id=atr.attr_id left join pms_product_attr_value pav on pa.attr_id=pav.attr_id
+        WHERE  ag.catelog_id=#{catalogId} and pav.spu_id=#{spuId}
+    </select>
+</mapper>
